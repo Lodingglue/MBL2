@@ -50,15 +50,25 @@ pub fn setup_logging() {
         android_logger::Config::default().with_max_level(log::LevelFilter::Trace),
     );
 }
-#[ctor::ctor]
-fn safe_setup() {
-    setup_logging();
+
+#[no_mangle]
+pub extern "C" fn rust_mbl2_init() {
     std::panic::set_hook(Box::new(move |panic_info| {
         log::error!("Thread crashed: {}", panic_info);
     }));
-    // Let it crash and burn if anything happens
     main();
 }
+
+//#[ctor::ctor]
+//fn safe_setup() {
+//    setup_logging();
+//    std::panic::set_hook(Box::new(move |panic_info| {
+ //       log::error!("Thread crashed: {}", panic_info);
+ //   }));
+ //   // Let it crash and burn if anything happens
+//    main();
+//}
+
 fn main() {
     log::info!("Starting, mbl2 version v0.1.12");
     let mcmaps = find_minecraft_library_manually()
